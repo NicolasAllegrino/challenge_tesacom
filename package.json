@@ -1,0 +1,22 @@
+{
+    "name": "challenge_tesacom",
+    "version": "1.0.0",
+    "description": "This package was developed for the Tesacom Challenge",
+    "main": "index.js",
+    "scripts": {
+        "test": "jest"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/NicolasAllegrino/challenge_tesacom.git"
+    },
+    "author": "Nicolas Allegrino",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/NicolasAllegrino/challenge_tesacom/issues"
+    },
+    "homepage": "https://github.com/NicolasAllegrino/challenge_tesacom#readme",
+    "devDependencies": {
+        "jest": "^28.1.3"
+    }
+}
