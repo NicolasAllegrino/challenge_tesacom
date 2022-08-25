@@ -2,7 +2,7 @@
     "name": "challenge_tesacom",
     "version": "1.0.0",
     "description": "This package was developed for the Tesacom Challenge",
-    "main": "index.js",
+    "main": "src/index.js",
     "scripts": {
         "test": "jest"
     },
