@@ -24,7 +24,7 @@ module.exports = {
      * 
      * @param {Buffer} buffer Buffer con los datos a decodificar (hex)
      * @param {Array<Object>} format Array con objetos que determinal el tipo de dato a decodificar [ { tag: "?", type: "?", len: ? } ]
-     * @returns {{tag: value}} Devuelvo un objeto, tipo diccionario 'tag':value, determinados por los format.tag y su valor correspondiente decodificado
+     * @returns {{tag: value}} Devuelvo un objeto, con formato { 'tag':value, ... } determinados por los format.tag y su valor correspondiente decodificado
      */
     decode(buffer, format) {
         return decodeData(buffer, format);

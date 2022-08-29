@@ -24,11 +24,25 @@ const format4 = [
     { tag: "var5", type: "float" },
     { tag: "var6", type: "float" },
 ];
+const format5 = [
+    { tag: "ASCII", type: "ascii" },
+    { tag: "var1", type: "int", len: 12 },
+    { tag: "ASCII2", type: "ascii" },
+    { tag: "var2", type: "uint", len: 14 }
+];
+const format6 = [
+    { tag: "var1", type: "int", len: 8 },
+    { tag: "ASCII1", type: "ascii" },
+    { tag: "var2", type: "uint", len: 12 },
+    { tag: "ASCII2", type: "ascii" }
+];
 
 var data1 = { "PTemp": 268, "BattVolt.value": 224, "WaterLevel": 115 };
 var data2 = { "var1": -1000, "var2": 224, "var3": 115, "var4": 268, "var5": 990 };
 var data3 = { "var1": 293.36, "var2": 36.45 };
 var data4 = { "var1": 201.22, "var2": 556.55, "var3": 115, "var4": -268, "var5": 22.05, "var6": 63.36 };
+var data5 = { "ASCII": "A~^s`#0", "var1": 1025, "ASCII2": "PRUEBO 1! Todo #0", "var2": 9999 };
+var data6 = { "var1": -55, "ASCII1": "A~^s#0", "var2": 268, "ASCII2": "Prueba Buffer ASCII#0" };
 
 describe('Tests encode', () => {
     test('Pass encode', () => {
@@ -47,6 +61,14 @@ describe('Tests encode', () => {
         result = encode.encode(data4, format4);
         expect(result.buffer.toString('hex')).toBe('43493852440b233373fffffef441b06666427d70a4');
         expect(result.size).toBe(21);
+
+        result = encode.encode(data5, format5);
+        expect(result.buffer.toString('hex')).toBe('20febdcf0236000000803429558b0a7a06285054df937a046c270f');
+        expect(result.size).toBe(27);
+
+        result = encode.encode(data6, format6);
+        expect(result.buffer.toString('hex')).toBe('01ff9307f5ee68d808650e5d72e2c282175cd9b2f241069c393251b0');
+        expect(result.size).toBe(28);
     });
 
     test('Fatal error encode', () => {

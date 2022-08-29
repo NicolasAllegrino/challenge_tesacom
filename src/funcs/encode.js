@@ -48,6 +48,7 @@ function encodeData(_object, format) {
                     //Si el valor es negativo lo convierto en complemento a 2
                     num = num.toString();
                     if (numOr < 0) {
+                        numOr = numOr * -1;
                         let str = "";
                         let c = 2;
                         if (num % 2 == 0) {
@@ -69,23 +70,40 @@ function encodeData(_object, format) {
                             }
                         }
 
-                        ((num % 2) == 0) ? str += 0: str += 1;
+                        ((numOr % 2) == 0) ? str += '0': str += '1';
 
                         buffer += str;
+                    } else {
+                        buffer += num;
                     }
                 }
                 //Conversión para tipo de dato float
                 else if (f.type == "float") {
+                    // console.log(Float32ToBin(val));
                     buffer += Float32ToBin(val);
+                }
+                //Conversión para tipo de dato ASCII
+                else if (f.type == "ascii") {
+                    val = Buffer.from(val, 'ascii');
+
+                    let buf1 = "";
+                    for (let c of val) {
+                        c = c.toString(2)
+                        if (c.length < 7) {
+                            c = '0'.repeat(7 - c.length) + c;
+                        }
+                        buf1 += c;
+                    }
+                    buffer += buf1.toString(2);
                 }
             });
 
-            //Convierto el string beffer en valor hexadecimal
-            buffer = new bignumber.BigNumber(buffer, 2).toString(16).toUpperCase();
-            //Creo el buffer con los datos
-            buffer = Buffer.from(buffer);
+            //Convierto el string buffer en valor hexadecimal
+            buffer = new bignumber.BigNumber(buffer, 2).toString(16);
             strBuffer = buffer.toString();
             if (strBuffer.length % 2 != 0) { strBuffer = '0' + strBuffer }
+
+            //Creo el buffer con los datos
             buffer = Buffer.from(strBuffer, 'hex');
             //Tamaño del Buffer
             let size = buffer.byteLength;

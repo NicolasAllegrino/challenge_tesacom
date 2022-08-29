@@ -14,34 +14,48 @@ function decodeData(buffer, format) {
 
         let by = x.toString(2);
         let suint = 0;
-        let sfloat = 0;
         let a = 0;
         let size = 0;
+        let sub1 = by;
+        let sisesub1 = 0;
+        let iasc = [];
         format.map(function(f) {
             if (f.type == "uint") {
-                sfloat = 1;
+                suint = 1;
                 size += f.len;
             };
             if (f.type == "int") {
                 suint = 1;
-                sfloat = 1;
                 size += (f.len <= 8) ? 16 : 32;
             };
             if ((f.type == "float")) {
                 if (a >= 1) {
-                    sfloat = 1;
+                    suint = 1;
                 }
                 size += 32;
                 a++;
             }
+            if ((f.type == "ascii")) {
+                suint = 1;
+                if (iasc.length == 0) {
+                    sisesub1 = sub1.indexOf('1000110110000') + 13;
+                    iasc.push(sub1.indexOf('1000110110000') + 13);
+                } else {
+                    sisesub1 = sub1.substring(iasc.length - 1).indexOf('1000110110000') + 13;
+                    iasc.push(sub1.substring(iasc.length - 1).indexOf('1000110110000') + 13 + iasc[iasc.length - 1]);
+                }
+                sub1 = sub1.substring(iasc[iasc.length - 1]);
+                size += sisesub1;
+            }
         });
-        // let size = (a != 0) ? (32 * a) : format.reduce((sum, value) => (sum + value.len), 0);
-        if (by.length != size || suint == 0 || sfloat == 0) {
+
+        if ((by.length != size && iasc.length == 0) || suint == 0) {
             by = '0'.repeat(size - by.length) + by.toString();
-        }
+        };
 
         let response = {};
         let i = 0;
+        let iiasc = 0;
         format.map(function(f) {
             //Conversion para tipo de dato uint
             if (f.type == "uint") {
@@ -52,11 +66,13 @@ function decodeData(buffer, format) {
             //Conversion para tipo de dato uint
             else if (f.type == "int") {
                 f.len = (f.len <= 8) ? 16 : 32;
-                value = by.toString().substring(i, i + f.len);
-                let xnum = new bignumber.BigNumber(value, 2);
-                if (value.length == 8 && x.gte("80", 16)) { xnum = xnum.minus("100", 16) };
-                if (value.length == 16 && x.gte("8000", 16)) { xnum = xnum.minus("10000", 16) };
-                if (value.length == 32 && x.gte("80000000", 16)) { xnum = xnum.minus("100000000", 16) };
+                val = by.toString().substring(i, i + f.len);
+                let xnum = new bignumber.BigNumber(val, 2);
+                if (val[0] == 1) {
+                    if (val.length == 8 && x.gte("80", 16)) { xnum = xnum.minus("100", 16) };
+                    if (val.length == 16 && x.gte("8000", 16)) { xnum = xnum.minus("10000", 16) };
+                    if (val.length == 32 && x.gte("80000000", 16)) { xnum = xnum.minus("100000000", 16) };
+                }
 
                 response[f.tag] = parseInt(xnum);
                 i += f.len;
@@ -68,6 +84,26 @@ function decodeData(buffer, format) {
 
                 response[f.tag] = parseFloat(value);
                 i += f.len;
+            }
+            //Cnversion para tipo de dato ASCII
+            else if (f.type == "ascii") {
+                val = by.toString().substring(i, iasc[iiasc] - 13);
+                let ca = val.length / 7;
+                let caux = "";
+                let cauxout = "";
+                let ci = 0;
+                for (ci = 0; ci < ca - 1; ci++) {
+                    caux = (ci == 0) ? val.substring(0, 7) : val.substring(((7 * ci)), ((7 * (ci + 1))));
+                    if (caux.length < 7) {
+                        caux = '0'.repeat(7 - caux.length) + caux.toString();
+                    }
+                    cauxout += BinToAscii(caux);
+                }
+
+                response[f.tag] = cauxout + "#0";
+
+                i += val.length + 13;
+                iiasc++;
             }
         });
 
@@ -97,6 +133,22 @@ function BinToFloat32(str) {
         }
         return float32 * sign;
     } else return 0
+}
+
+/**
+ * Conversión de String Binario a ASCII
+ * @param {String} str String de trama binaria a decodificar en ASCII
+ * @returns {String} Cadena de carácteres
+ */
+function BinToAscii(str) {
+    var i = 0,
+        l = str.length,
+        chr, out = '';
+    for (; i < l; i += 8) {
+        chr = parseInt(str.substring(i, 8), 2).toString(16);
+        out += '%' + ((chr.length % 2 == 0) ? chr : '0' + chr);
+    }
+    return decodeURIComponent(out);
 }
 
 module.exports = decodeData;
