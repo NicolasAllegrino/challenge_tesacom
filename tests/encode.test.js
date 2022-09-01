@@ -36,6 +36,10 @@ const format6 = [
     { tag: "var2", type: "uint", len: 12 },
     { tag: "ASCII2", type: "ascii" }
 ];
+const format7 = [
+    { tag: "ASCII", type: "ascii" },
+    { tag: "ASCII2", type: "ascii" }
+];
 
 var data1 = { "PTemp": 268, "BattVolt.value": 224, "WaterLevel": 115 };
 var data2 = { "var1": -1000, "var2": 224, "var3": 115, "var4": 268, "var5": 990 };
@@ -43,6 +47,7 @@ var data3 = { "var1": 293.36, "var2": 36.45 };
 var data4 = { "var1": 201.22, "var2": 556.55, "var3": 115, "var4": -268, "var5": 22.05, "var6": 63.36 };
 var data5 = { "ASCII": "A~^s`#0", "var1": 1025, "ASCII2": "PRUEBO 1! Todo #0", "var2": 9999 };
 var data6 = { "var1": -55, "ASCII1": "A~^s#0", "var2": 268, "ASCII2": "Prueba Buffer ASCII#0" };
+var data7 = { "ASCII": "0#0", "ASCII2": "P#0" };
 
 describe('Tests encode', () => {
     test('Pass encode', () => {
@@ -69,6 +74,10 @@ describe('Tests encode', () => {
         result = encode.encode(data6, format6);
         expect(result.buffer.toString('hex')).toBe('01ff9307f5ee68d808650e5d72e2c282175cd9b2f241069c393251b0');
         expect(result.size).toBe(28);
+
+        result = encode.encode(data7, format7);
+        expect(result.buffer.toString('hex')).toBe('0182361411b0');
+        expect(result.size).toBe(6);
     });
 
     test('Fatal error encode', () => {

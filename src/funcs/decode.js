@@ -38,11 +38,11 @@ function decodeData(buffer, format) {
             if ((f.type == "ascii")) {
                 suint = 1;
                 if (iasc.length == 0) {
-                    sisesub1 = sub1.indexOf('1000110110000') + 13;
-                    iasc.push(sub1.indexOf('1000110110000') + 13);
+                    sisesub1 = sub1.indexOf('01000110110000') + 14;
+                    iasc.push(sub1.indexOf('01000110110000') + 14);
                 } else {
-                    sisesub1 = sub1.substring(iasc.length - 1).indexOf('1000110110000') + 13;
-                    iasc.push(sub1.substring(iasc.length - 1).indexOf('1000110110000') + 13 + iasc[iasc.length - 1]);
+                    sisesub1 = sub1.substring(iasc.length - 1).indexOf('01000110110000') + 14;
+                    iasc.push(sub1.substring(iasc.length - 1).indexOf('01000110110000') + 14 + iasc[iasc.length - 1]);
                 }
                 sub1 = sub1.substring(iasc[iasc.length - 1]);
                 size += sisesub1;
@@ -56,6 +56,7 @@ function decodeData(buffer, format) {
         let response = {};
         let i = 0;
         let iiasc = 0;
+        let aasc = 0;
         format.map(function(f) {
             //Conversion para tipo de dato uint
             if (f.type == "uint") {
@@ -87,12 +88,19 @@ function decodeData(buffer, format) {
             }
             //Cnversion para tipo de dato ASCII
             else if (f.type == "ascii") {
-                val = by.toString().substring(i, iasc[iiasc] - 13);
+                val = by.toString().substring(i, iasc[iiasc] - 14);
                 let ca = val.length / 7;
+                if (iiasc == 0 && aasc == 0 && ca % 1 != 0) {
+                    val = by.toString().substring(i - 1, iasc[iiasc] - 14);
+                    val = '0' + val.toString();
+                    sumi = 13;
+                } else {
+                    sumi = 14;
+                }
                 let caux = "";
                 let cauxout = "";
                 let ci = 0;
-                for (ci = 0; ci < ca - 1; ci++) {
+                for (ci = 0; ci < ca; ci++) {
                     caux = (ci == 0) ? val.substring(0, 7) : val.substring(((7 * ci)), ((7 * (ci + 1))));
                     if (caux.length < 7) {
                         caux = '0'.repeat(7 - caux.length) + caux.toString();
@@ -102,9 +110,10 @@ function decodeData(buffer, format) {
 
                 response[f.tag] = cauxout + "#0";
 
-                i += val.length + 13;
+                i += val.length + sumi;
                 iiasc++;
             }
+            aasc++;
         });
 
         return response;

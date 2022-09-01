@@ -46,7 +46,6 @@ function encodeData(_object, format) {
                     }
 
                     //Si el valor es negativo lo convierto en complemento a 2
-                    num = num.toString();
                     if (numOr < 0) {
                         numOr = numOr * -1;
                         let str = "";
@@ -79,7 +78,6 @@ function encodeData(_object, format) {
                 }
                 //Conversión para tipo de dato float
                 else if (f.type == "float") {
-                    // console.log(Float32ToBin(val));
                     buffer += Float32ToBin(val);
                 }
                 //Conversión para tipo de dato ASCII

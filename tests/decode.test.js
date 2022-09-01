@@ -37,6 +37,10 @@ const format6 = [
     { tag: "var2", type: "uint", len: 12 },
     { tag: "ASCII2", type: "ascii" }
 ];
+const format7 = [
+    { tag: "ASCII", type: "ascii" },
+    { tag: "ASCII2", type: "ascii" }
+];
 
 var dataBuffer1 = Buffer.from('10c0e073', 'hex');
 var data1 = { "PTemp": 268, "BattVolt.value": 224, "WaterLevel": 115 };
@@ -55,6 +59,9 @@ var data5 = { "ASCII": "A~^s`#0", "var1": 1025, "ASCII2": "PRUEBO 1! Todo #0", "
 
 var dataBuffer6 = Buffer.from('01ff9307f5ee68d808650e5d72e2c282175cd9b2f241069c393251b0', 'hex');
 var data6 = { "var1": -55, "ASCII1": "A~^s#0", "var2": 268, "ASCII2": "Prueba Buffer ASCII#0" };
+
+var dataBuffer7 = Buffer.from('0182361411b0', 'hex');
+var data7 = { "ASCII": "0#0", "ASCII2": "P#0" };
 
 describe('Tests decode', () => {
     test('Pass decode', () => {
@@ -93,6 +100,10 @@ describe('Tests decode', () => {
         expect(result["ASCII1"]).toBe(data6["ASCII1"]);
         expect(result["var2"]).toBe(data6["var2"]);
         expect(result["ASCII2"]).toBe(data6["ASCII2"]);
+
+        result = decode.decode(dataBuffer7, format7);
+        expect(result["ASCII"]).toBe(data7["ASCII"]);
+        expect(result["ASCII2"]).toBe(data7["ASCII2"]);
     });
 
     test('Fatal error decode', () => {
