@@ -48,14 +48,10 @@ Este método devuelve un objeto con formato:
 > 'tag' -> Va a corresponder al nombre determinado por el Format <br>
 > value -> Valor del tag correspondiente decodificado del Buffer <br>
 
-## IMPORTANTE
-Para garantizar una correcta codificación/decodificación, cuyos datos contienen campos ASCII,
-se recomienda tener como primer dato un ASCII y luego los demás.
-
 ## Cambios de versiones
 ### Versión 1.1.0
 * Se agrega codificación y decodificación para datos ASCII
 * Se resuelve codificación y decodificación para datos int positivos
 
-### Versión 1.1.0
-* Se resuelve codificación ASCII cuyos binarios comienzan en 01... (considerando 7 bits)
+### Versión 2.0.0
+* Se modifica encode y decode

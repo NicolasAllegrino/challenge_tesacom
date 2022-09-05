@@ -1,5 +1,3 @@
-const bignumber = require('./bignumber.min.js');
-
 /**
  * Decodificación de datos recibidos en el Buffer
  * a un Objeto,
@@ -10,118 +8,74 @@ const bignumber = require('./bignumber.min.js');
  */
 function decodeData(buffer, format) {
     try {
-        var x = new bignumber.BigNumber(buffer.toString('hex'), 16);
-
-        let by = x.toString(2);
-        let suint = 0;
-        let a = 0;
-        let size = 0;
-        let sub1 = by;
-        let sisesub1 = 0;
-        let iasc = [];
-        format.map(function(f) {
-            if (f.type == "uint") {
-                suint = 1;
-                size += f.len;
-            };
-            if (f.type == "int") {
-                suint = 1;
-                size += (f.len <= 8) ? 16 : 32;
-            };
-            if ((f.type == "float")) {
-                if (a >= 1) {
-                    suint = 1;
-                }
-                size += 32;
-                a++;
-            }
-            if ((f.type == "ascii")) {
-                suint = 1;
-                if (iasc.length == 0) {
-                    sisesub1 = sub1.indexOf('01000110110000') + 14;
-                    iasc.push(sub1.indexOf('01000110110000') + 14);
-                } else {
-                    sisesub1 = sub1.substring(iasc.length - 1).indexOf('01000110110000') + 14;
-                    iasc.push(sub1.substring(iasc.length - 1).indexOf('01000110110000') + 14 + iasc[iasc.length - 1]);
-                }
-                sub1 = sub1.substring(iasc[iasc.length - 1]);
-                size += sisesub1;
-            }
-        });
-
-        if ((by.length != size && iasc.length == 0) || suint == 0) {
-            by = '0'.repeat(size - by.length) + by.toString();
-        };
+        var buf = buffer.toString('hex');
 
         let response = {};
         let i = 0;
-        let iiasc = 0;
-        let aasc = 0;
         format.map(function(f) {
             //Conversion para tipo de dato uint
             if (f.type == "uint") {
-                value = parseInt(by.slice(i, (i + f.len)), 2);
-                response[f.tag] = value;
+                if ((f.len % 4 != 0)) {
+                    f.len = parseInt(f.len / 4);
+                    f.len = f.len + 1;
+                } else {
+                    f.len = f.len / 4;
+                }
+                val = parseInt(buf.substring(i, (i + f.len)), 16);
+                response[f.tag] = val;
+
                 i += f.len;
             }
             //Conversion para tipo de dato uint
             else if (f.type == "int") {
-                f.len = (f.len <= 8) ? 16 : 32;
-                val = by.toString().substring(i, i + f.len);
-                let xnum = new bignumber.BigNumber(val, 2);
-                if (val[0] == 1) {
-                    if (val.length == 8 && x.gte("80", 16)) { xnum = xnum.minus("100", 16) };
-                    if (val.length == 16 && x.gte("8000", 16)) { xnum = xnum.minus("10000", 16) };
-                    if (val.length == 32 && x.gte("80000000", 16)) { xnum = xnum.minus("100000000", 16) };
+                li = f.len;
+                if ((f.len % 4 != 0)) {
+                    f.len = parseInt(f.len / 4);
+                    f.len = f.len + 1;
+                } else {
+                    f.len = f.len / 4;
                 }
 
-                response[f.tag] = parseInt(xnum);
+                subf = parseInt(buf.substring(i, (i + f.len)), 16).toString(2).padStart(li, '0');
+                if (subf[0] == 1 && (subf.length == li)) {
+                    val = subf.toString(2).padStart(32, 1);
+                    val = (parseInt(val, 2) << 0);
+                    response[f.tag] = parseInt(val);
+                } else {
+                    response[f.tag] = parseInt(subf, 2);
+                }
                 i += f.len;
             }
             //Conversion para tipo de dato float
             else if (f.type == "float") {
-                f.len = 32;
-                value = BinToFloat32(by.toString(10).substring(i, i + f.len));
+                f.len = 8;
+                val = parseInt(buf.substring(i, (i + f.len)), 16).toString(2);
+                val = BinToFloat32(val);
 
-                response[f.tag] = parseFloat(value);
+                response[f.tag] = parseFloat(val);
                 i += f.len;
             }
             //Cnversion para tipo de dato ASCII
             else if (f.type == "ascii") {
-                val = by.toString().substring(i, iasc[iiasc] - 14);
-                let ca = val.length / 7;
-                if (iiasc == 0 && aasc == 0 && ca % 1 != 0) {
-                    val = by.toString().substring(i - 1, iasc[iiasc] - 14);
-                    val = '0' + val.toString();
-                    sumi = 13;
-                } else {
-                    sumi = 14;
-                }
+                val = buf.substring(i, (i + (buf.substring(i).indexOf(2330) + 4)));
+                let ca = val.length / 2;
                 let caux = "";
                 let cauxout = "";
-                let ci = 0;
-                for (ci = 0; ci < ca; ci++) {
-                    caux = (ci == 0) ? val.substring(0, 7) : val.substring(((7 * ci)), ((7 * (ci + 1))));
-                    if (caux.length < 7) {
-                        caux = '0'.repeat(7 - caux.length) + caux.toString();
-                    }
+                for (let ci = 0; ci < ca; ci++) {
+                    caux = parseInt(val.substring(((2 * ci)), ((2 * ci) + 2)), 16).toString(2);
                     cauxout += BinToAscii(caux);
                 }
 
-                response[f.tag] = cauxout + "#0";
-
-                i += val.length + sumi;
-                iiasc++;
+                response[f.tag] = cauxout;
+                i += cauxout.length * 2;
             }
-            aasc++;
         });
 
         return response;
     } catch (error) {
-        return 'Fatal error';
+        throw error;
     }
 }
-
 
 //UTILIDADES
 /**

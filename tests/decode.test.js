@@ -45,22 +45,22 @@ const format7 = [
 var dataBuffer1 = Buffer.from('10c0e073', 'hex');
 var data1 = { "PTemp": 268, "BattVolt.value": 224, "WaterLevel": 115 };
 
-var dataBuffer2 = Buffer.from('0fffffc180e07310c3de', 'hex');
+var dataBuffer2 = Buffer.from('c180e07310c3de', 'hex');
 var data2 = { "var1": -1000, "var2": 224, "var3": 115, "var4": 268, "var5": 990 };
 
 var dataBuffer3 = Buffer.from('4392ae144211cccd', 'hex');
 var data3 = { "var1": 293.3599853515625, "var2": 36.45000076293945 };
 
-var dataBuffer4 = Buffer.from('43493852440b233373fffffef441b06666427d70a4', 'hex');
+var dataBuffer4 = Buffer.from('43493852440b233373ef441b06666427d70a40', 'hex');
 var data4 = { "var1": 201.22000122070312, "var2": 556.5499877929688, "var3": 115, "var4": -268, "var5": 22.049999237060547, "var6": 63.36000061035156 };
 
-var dataBuffer5 = Buffer.from('20febdcf0236000000803429558b0a7a06285054df937a046c270f', 'hex');
+var dataBuffer5 = Buffer.from('417e5e7360233040150525545424f20312120546f646f202330270f0', 'hex');
 var data5 = { "ASCII": "A~^s`#0", "var1": 1025, "ASCII2": "PRUEBO 1! Todo #0", "var2": 9999 };
 
-var dataBuffer6 = Buffer.from('01ff9307f5ee68d808650e5d72e2c282175cd9b2f241069c393251b0', 'hex');
-var data6 = { "var1": -55, "ASCII1": "A~^s#0", "var2": 268, "ASCII2": "Prueba Buffer ASCII#0" };
+var dataBuffer6 = Buffer.from('c928417e5e7329233010c5072756562612042756666657220415343494923300', 'hex');
+var data6 = { "var1": -55, "ASCII1": "(A~^s)#0", "var2": 268, "ASCII2": "Prueba Buffer ASCII#0" };
 
-var dataBuffer7 = Buffer.from('0182361411b0', 'hex');
+var dataBuffer7 = Buffer.from('302330502330', 'hex');
 var data7 = { "ASCII": "0#0", "ASCII2": "P#0" };
 
 describe('Tests decode', () => {
@@ -104,10 +104,5 @@ describe('Tests decode', () => {
         result = decode.decode(dataBuffer7, format7);
         expect(result["ASCII"]).toBe(data7["ASCII"]);
         expect(result["ASCII2"]).toBe(data7["ASCII2"]);
-    });
-
-    test('Fatal error decode', () => {
-        const result = decode.decode("", "");
-        expect(result).toBe('Fatal error');
     });
 });
